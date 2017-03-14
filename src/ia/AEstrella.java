@@ -320,15 +320,14 @@ public class AEstrella extends PApplet {
         void inicializa(Mosaico estadoInicial, Mosaico estadoFinal) {
             resuelto = false;
             this.estadoFinal = estadoFinal;
-            // aqui deben incializar sus listas abierta y cerrada
-            // listaAbierta = new PriorityQueue();
-            // listaCerrada = new Hashtable();
+            listaAbierta = new PriorityQueue();
+            listaCerrada = new Hashtable();
             estadoInicial.calculaHeuristica(estadoFinal);
             estadoInicial.tipo = Tipo.ESTADO_INICIAL;
             estadoFinal.tipo = Tipo.ESTADO_FINAL;
 
             nodoPrevio = new NodoBusqueda(estadoInicial);
-            // listaAbierta.offer(nodoPrevio);
+            listaAbierta.offer(nodoPrevio);
         }
 
         void expandeNodoSiguiente() {
@@ -342,7 +341,26 @@ public class AEstrella extends PApplet {
               * la accion correspondiente.
               */
 	    if(!resuelto){
-		
+		NodoBusqueda actual = listaAbierta.poll();
+		listaCerrada.put(actual.estado,actual.estado);
+		if(actual.equals(estadoFinal)){
+		    return;
+		} else {
+		    for(NodoBusqueda x : actual.getSucesores()){
+			if(!listaCerrada.contains(x)){
+			    if(!listaAbierta.contains(x)){
+				x.padre=actual;
+				x.gn=actual.gn+10;
+				listaAbierta.add(x);
+			    } else {
+				if(actual.gn+10<x.gn){
+				    x.padre=actual;
+				    x.gn=actual.gn+10;
+				}
+			    }
+			}
+		    }
+		}
 	    }
         }
     }
