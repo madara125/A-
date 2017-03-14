@@ -15,6 +15,7 @@ import java.util.PriorityQueue;
 /**
  *
  * @author Verónica Arriola
+ * @author madara125
  */
 public class AEstrella extends PApplet {
 
@@ -161,7 +162,7 @@ public class AEstrella extends PApplet {
 
     // --- Clase Mosaico
     // Representa cada casilla del mundo, corresponde a un estado posible del agente.
-    class Mosaico{
+    class Mosaico implements Comparable<Mosaico>{
         Situacion situacion = Situacion.SIN_VISITAR;
         Tipo tipo = Tipo.VACIO;
         int renglon, columna;  // Coordenadas de este mosaico
@@ -188,8 +189,24 @@ public class AEstrella extends PApplet {
             * HINT: calculen la distancia de este mosaico hacia el mosaico meta y luego multipliquenlo por 10
             * para que el valor sea significativo. tampoco deberia haber valores negativos
             */
-            hn = (Math.abs(meta.renglon-renglon)+Math.abs(meta.columna-columna)) * 10;
+            hn = (int)Math.sqrt((meta.renglon-renglon)^2+(meta.columna-columna)^2) * 10;
         }
+	public int compareTo(Mosaico m){
+	    return hn-m.hn;
+        }
+	LinkedList<Mosaico> getSucesores() {
+            LinkedList<Mosaico> sucesores = new LinkedList();
+            Mosaico sucesor;
+            for(Accion a : Accion.values()) {
+                sucesor = this.aplicaAccion(a);
+                if(sucesor != null) {
+                    sucesor.gn = this.gn + a.costo();
+                    sucesor.padre = this;
+                    sucesores.add(sucesor);
+                }
+            }
+            return sucesores;
+	}
 
         /**
         * Devuelve una referencia al mosaico del mapa a donde se movería el agente
@@ -309,7 +326,7 @@ public class AEstrella extends PApplet {
 
     // --- A*
     class Algoritmo {
-        private PriorityQueue<NodoBusqueda> listaAbierta;
+        private PriorityQueue<Mosaico> listaAbierta;
         private Hashtable<Mosaico, Mosaico> listaCerrada;
         Mosaico estadoFinal;  // Referencia al mosaico meta.
         boolean resuelto;
@@ -327,9 +344,8 @@ public class AEstrella extends PApplet {
             estadoFinal.tipo = Tipo.ESTADO_FINAL;
 
             nodoPrevio = new NodoBusqueda(estadoInicial);
-            listaAbierta.offer(nodoPrevio);
+            listaAbierta.offer(nodoPrevio.estado);
         }
-
         void expandeNodoSiguiente() {
             /**
               * IMPLEMENTACION
@@ -341,16 +357,18 @@ public class AEstrella extends PApplet {
               * la accion correspondiente.
               */
 	    if(!resuelto){
-		NodoBusqueda actual = listaAbierta.poll();
-		listaCerrada.put(actual.estado,actual.estado);
+		Mosaico actual = listaAbierta.poll();
+		actual.situacion= Situacion.EN_LISTA_CERRADA;
+		listaCerrada.put(actual,actual);
 		if(actual.equals(estadoFinal)){
+		    resuelto=true;
 		    return;
 		} else {
-		    for(NodoBusqueda x : actual.getSucesores()){
+		    for(Mosaico x : actual.getSucesores()){
 			if(!listaCerrada.contains(x)){
 			    if(!listaAbierta.contains(x)){
 				x.padre=actual;
-				x.gn=actual.gn+10;
+				x.situacion = Situacion.EN_LISTA_ABIERTA;
 				listaAbierta.add(x);
 			    } else {
 				if(actual.gn+10<x.gn){
