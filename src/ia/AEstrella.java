@@ -307,7 +307,7 @@ public class AEstrella extends PApplet {
         }
 
         public int compareTo(NodoBusqueda nb){
-            return getHn() - nb.getHn();
+            return getFn() - nb.getFn();
         }
 
         /** En la lista abierta se considera que dos nodos son iguales si se refieren al mismo estado. */
