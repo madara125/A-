@@ -361,18 +361,22 @@ public class AEstrella extends PApplet {
 		    NodoBusqueda x1= actual;
 		    resuelto=true;
 		    listaAbierta.clear();
+		    while(!tmp.equals(nodoPrevio.estado)){
+			tmp.padre.situacion=Situacion.EN_SOLUCION;
+			tmp=tmp.padre;
+		    }
 		    return;
 		} else {
 		    for(NodoBusqueda x : actual.getSucesores()){
 			if(!listaCerrada.contains(x.estado)){
-			    if(!listaAbierta.contains(x)){
+			    if(!listaAbierta.contains(x) && x.estado.situacion==Situacion.SIN_VISITAR){
 				x.estado.padre=actual.estado;
 				x.estado.situacion = Situacion.EN_LISTA_ABIERTA;
 				listaAbierta.add(x);
 			    } else {
 				if(x.gn < actual.gn){
 				    x.estado.padre=actual.estado;
-				    x.gn=actual.gn;
+				    x.gn=actual.gn+x.accionPadre.costo();
 				}
 			    }
 			}
