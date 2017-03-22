@@ -192,7 +192,7 @@ public class AEstrella extends PApplet {
             * HINT: calculen la distancia de este mosaico hacia el mosaico meta y luego multipliquenlo por 10
             * para que el valor sea significativo. tampoco deberia haber valores negativos
             */
-            hn = Math.abs(meta.renglon-renglon)+Math.abs(meta.columna-columna) * 10;
+            hn = (Math.abs(meta.renglon-renglon)+Math.abs(meta.columna-columna)) * 10;
         }
 	public int compareTo(Mosaico m){
 	    return hn-m.hn;
