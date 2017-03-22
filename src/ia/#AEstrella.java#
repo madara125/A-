@@ -175,16 +175,13 @@ public class AEstrella extends PApplet {
             this.renglon = renglon;
             this.columna = columna;
             this.mapa = mapa;
-	    this.calculaHeuristica(this);
         }
 
         /** Devuelve el valor actual de fn. */
         int fn() {
             return gn + hn;
         }
-	boolean equals(Mosaico m){
-	    return renglon==m.renglon&&columna==m.columna;
-	}
+
         /** Calcula la distancia Manhattan a la meta. */
         void calculaHeuristica(Mosaico meta){
             /**
@@ -284,9 +281,6 @@ public class AEstrella extends PApplet {
         int getFn() {
             return gn + estado.hn;
         }
-	int getHn() {
-            return estado.hn;
-        }
 
         /** Calcula los nodos de búsqueda sucesores. */
         LinkedList<NodoBusqueda> getSucesores() {
@@ -307,7 +301,7 @@ public class AEstrella extends PApplet {
         }
 
         public int compareTo(NodoBusqueda nb){
-            return getHn() - nb.getHn();
+            return getFn() - nb.getFn();
         }
 
         /** En la lista abierta se considera que dos nodos son iguales si se refieren al mismo estado. */
@@ -356,8 +350,7 @@ public class AEstrella extends PApplet {
 		    actual.estado.padre.situacion= Situacion.EN_LISTA_CERRADA;
 		}
 		actual.estado.situacion = Situacion.ACTUAL;
-		Mosaico tmp = actual.estado;
-		if(tmp.equals(estadoFinal)){
+		if(actual.estado.equals(new NodoBusqueda(estadoFinal))){
 		    NodoBusqueda x1= actual;
 		    resuelto=true;
 		    listaAbierta.clear();
@@ -368,6 +361,7 @@ public class AEstrella extends PApplet {
 			    if(!listaAbierta.contains(x)){
 				x.estado.padre=actual.estado;
 				x.estado.situacion = Situacion.EN_LISTA_ABIERTA;
+				x.gn=
 				listaAbierta.add(x);
 			    } else {
 				if(x.gn < actual.gn){
